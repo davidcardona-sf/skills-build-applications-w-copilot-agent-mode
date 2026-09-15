@@ -1,15 +1,21 @@
 import express from 'express';
+import cors from 'cors';
 
 import './config/database.js';
 import { Activity, LeaderboardEntry, Team, User, Workout } from './models/octofit.js';
 
 const app = express();
 const port = Number(process.env.PORT) || 8000;
+const host = '0.0.0.0';
 const codespaceName = process.env.CODESPACE_NAME;
 const baseUrl = codespaceName
   ? `https://${codespaceName}-8000.app.github.dev`
   : `http://localhost:${port}`;
+const allowedOrigins = codespaceName
+  ? [`https://${codespaceName}-5173.app.github.dev`, 'http://localhost:5173']
+  : ['http://localhost:5173'];
 
+app.use(cors({ origin: allowedOrigins }));
 app.use(express.json());
 
 app.get('/api/health', (_request, response) => {
@@ -61,6 +67,6 @@ app.get('/api/workouts/', async (_request, response, next) => {
   }
 });
 
-app.listen(port, () => {
+app.listen(port, host, () => {
   console.log(`OctoFit Tracker API listening at ${baseUrl}`);
 });
